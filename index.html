@@ -19,11 +19,31 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        body.custom-bg {
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body.custom-bg::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
         }
 
         .app {
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .header {
@@ -36,7 +56,7 @@
             font-size: clamp(48px, 12vw, 72px);
             font-weight: 300;
             letter-spacing: 3px;
-            text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            text-shadow: 0 4px 30px rgba(0,0,0,0.5);
             margin: 20px 0;
             font-variant-numeric: tabular-nums;
         }
@@ -45,6 +65,30 @@
             font-size: clamp(14px, 4vw, 18px);
             opacity: 0.95;
             font-weight: 500;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg) scale(1.1);
         }
 
         .container {
@@ -56,6 +100,7 @@
             width: 100%;
             padding: 18px;
             background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
             border: 2px dashed rgba(255, 255, 255, 0.4);
             border-radius: 16px;
             color: white;
@@ -83,10 +128,11 @@
         }
 
         .alarm-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -104,6 +150,15 @@
             transition: opacity 0.3s;
         }
 
+        .alarm-card.custom-sound::after {
+            content: '🎵';
+            position: absolute;
+            top: 10px;
+            right: 70px;
+            font-size: 20px;
+            opacity: 0.6;
+        }
+
         .alarm-card:hover::before {
             opacity: 1;
         }
@@ -114,7 +169,7 @@
 
         .alarm-card:hover {
             transform: translateX(4px);
-            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.35);
         }
 
         .alarm-header {
@@ -202,6 +257,11 @@
             font-weight: 500;
         }
 
+        .detail-badge.custom {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
         .detail-badge svg {
             width: 14px;
             height: 14px;
@@ -271,7 +331,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -294,7 +354,7 @@
             max-height: 90vh;
             overflow-y: auto;
             animation: slideUp 0.3s ease;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
         @keyframes slideUp {
@@ -447,6 +507,35 @@
         .sound-desc {
             font-size: 11px;
             opacity: 0.8;
+        }
+
+        .file-upload {
+            margin-top: 15px;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn.has-file {
+            background: linear-gradient(135deg, #10b981, #059669);
         }
 
         .volume-control {
@@ -608,6 +697,173 @@
             opacity: 0.8;
         }
 
+        .settings-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .theme-option {
+            aspect-ratio: 16/9;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-option:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-option.active {
+            border-color: white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .theme-option .theme-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .custom-bg-input {
+            display: none;
+        }
+
+        .bg-preview {
+            width: 100%;
+            height: 120px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            border: 2px dashed #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bg-preview:hover {
+            border-color: #667eea;
+        }
+
+        .bg-preview.has-image {
+            border-style: solid;
+            border-color: #667eea;
+        }
+
+        .motivational-quotes {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .quote-text {
+            font-size: 16px;
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .quote-author {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .math-challenge {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .challenge-title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .math-problem {
+            font-size: 32px;
+            font-weight: 300;
+            text-align: center;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .challenge-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            font-size: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .challenge-feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .challenge-feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .challenge-feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         @media (max-width: 480px) {
             .app {
                 padding: 15px;
@@ -624,6 +880,10 @@
             .btn-stop, .btn-snooze {
                 padding: 15px 30px;
                 font-size: 16px;
+            }
+
+            .theme-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -660,6 +920,61 @@
             font-size: 18px;
             font-weight: 500;
         }
+
+        .fade-duration {
+            margin-top: 15px;
+        }
+
+        .vibration-pattern {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .vibration-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .vibration-option:hover {
+            border-color: #cbd5e0;
+        }
+
+        .vibration-option.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+            color: #2d3748;
+        }
     </style>
 </head>
 <body>
@@ -678,7 +993,7 @@
         const { useState, useEffect, useRef } = React;
 
         // ====================================
-        // COMPONENTES DE ÍCONES
+        // ÍCONES
         // ====================================
         const Icon = ({ name, size = 24, className = "" }) => {
             const icons = {
@@ -693,12 +1008,19 @@
                 save: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
                 x: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
                 stickyNote: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg>,
+                settings: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m0-18a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm8.66 5.34l-4.25 4.24m-4.82 4.82L7.34 16.66M23 12h-6m-6 0H1m18.66 5.34l-4.25-4.24m-4.82-4.82L7.34 7.34"/></svg>,
+                image: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
+                upload: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
+                quote: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>,
+                brain: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>,
+                palette: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>,
+                smartphone: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
             };
             return icons[name] || null;
         };
 
         // ====================================
-        // SONS PADRÃO
+        // DADOS
         // ====================================
         const DEFAULT_SOUNDS = [
             { id: 1, name: "Clássico", description: "Bip-Bip tradicional", type: "beep" },
@@ -710,6 +1032,141 @@
         const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
         const WEEKDAYS_FULL = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
+        const THEMES = [
+            { id: 'gradient1', name: 'Roxo Aurora', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+            { id: 'gradient2', name: 'Oceano', gradient: 'linear-gradient(135deg, #2196F3 0%, #00BCD4 100%)' },
+            { id: 'gradient3', name: 'Sunset', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+            { id: 'gradient4', name: 'Floresta', gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
+            { id: 'gradient5', name: 'Fogo', gradient: 'linear-gradient(135deg, #FF512F 0%, #F09819 100%)' },
+            { id: 'gradient6', name: 'Noite', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)' },
+        ];
+
+        const MOTIVATIONAL_QUOTES = [
+            { text: "O sucesso é a soma de pequenos esforços repetidos dia após dia.", author: "Robert Collier" },
+            { text: "Acorde com determinação. Vá dormir com satisfação.", author: "Anônimo" },
+            { text: "Cada manhã é uma nova oportunidade de recomeçar.", author: "Anônimo" },
+            { text: "O único modo de fazer um excelente trabalho é amar o que você faz.", author: "Steve Jobs" },
+            { text: "Não conte os dias, faça os dias contarem.", author: "Muhammad Ali" },
+            { text: "A persistência é o caminho do êxito.", author: "Charles Chaplin" },
+            { text: "Você é mais forte do que pensa.", author: "Anônimo" },
+            { text: "Grandes coisas nunca vêm da zona de conforto.", author: "Anônimo" },
+        ];
+
+        const VIBRATION_PATTERNS = [
+            { id: 'light', name: 'Leve', pattern: [200, 100, 200] },
+            { id: 'medium', name: 'Médio', pattern: [400, 200, 400, 200, 400] },
+            { id: 'strong', name: 'Forte', pattern: [500, 300, 500, 300, 500] },
+            { id: 'sos', name: 'SOS', pattern: [100, 100, 100, 100, 100, 200, 400, 200, 400, 200, 400, 200, 100, 100, 100] },
+        ];
+
+        // ====================================
+        // COMPONENTE DE CONFIGURAÇÕES
+        // ====================================
+        function SettingsPanel({ settings, onSave, onClose }) {
+            const [theme, setTheme] = useState(settings.theme || 'gradient1');
+            const [customBg, setCustomBg] = useState(settings.customBg || null);
+            const [showQuotes, setShowQuotes] = useState(settings.showQuotes !== false);
+            const fileInputRef = useRef(null);
+
+            const handleBgUpload = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        setCustomBg(event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleSave = () => {
+                onSave({ theme, customBg, showQuotes });
+                onClose();
+            };
+
+            return (
+                <div className="settings-panel">
+                    <div className="modal-header">
+                        <h2 className="modal-title">Configurações</h2>
+                        <button className="close-btn" onClick={onClose}>
+                            <Icon name="x" />
+                        </button>
+                    </div>
+
+                    <div className="settings-section">
+                        <div className="section-title">
+                            <Icon name="palette" size={20} />
+                            Temas
+                        </div>
+                        <div className="theme-grid">
+                            {THEMES.map(t => (
+                                <div
+                                    key={t.id}
+                                    className={`theme-option ${theme === t.id && !customBg ? 'active' : ''}`}
+                                    style={{ background: t.gradient }}
+                                    onClick={() => {
+                                        setTheme(t.id);
+                                        setCustomBg(null);
+                                    }}
+                                >
+                                    <div className="theme-name">{t.name}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="settings-section">
+                        <div className="section-title">
+                            <Icon name="image" size={20} />
+                            Plano de Fundo Personalizado
+                        </div>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleBgUpload}
+                            className="custom-bg-input"
+                        />
+                        <div
+                            className={`bg-preview ${customBg ? 'has-image' : ''}`}
+                            style={customBg ? { backgroundImage: `url(${customBg})` } : {}}
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            {!customBg && (
+                                <div style={{ textAlign: 'center', color: '#999' }}>
+                                    <Icon name="upload" size={32} />
+                                    <div style={{ marginTop: 8, fontSize: 14 }}>Clique para enviar imagem</div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="settings-section">
+                        <div className="section-title">
+                            <Icon name="quote" size={20} />
+                            Frases Motivacionais
+                        </div>
+                        <div className="checkbox-group">
+                            <input
+                                type="checkbox"
+                                id="showQuotes"
+                                checked={showQuotes}
+                                onChange={(e) => setShowQuotes(e.target.checked)}
+                            />
+                            <label htmlFor="showQuotes">
+                                Exibir frase motivacional diária
+                            </label>
+                        </div>
+                    </div>
+
+                    <button className="btn-save" onClick={handleSave}>
+                        <Icon name="save" size={20} />
+                        Salvar Configurações
+                    </button>
+                </div>
+            );
+        }
+
         // ====================================
         // COMPONENTE DE FORMULÁRIO
         // ====================================
@@ -720,6 +1177,11 @@
             const [sound, setSound] = useState(editingAlarm?.sound || 1);
             const [volume, setVolume] = useState(editingAlarm?.volume || 0.7);
             const [note, setNote] = useState(editingAlarm?.note || '');
+            const [customSound, setCustomSound] = useState(editingAlarm?.customSound || null);
+            const [fadeDuration, setFadeDuration] = useState(editingAlarm?.fadeDuration || 0);
+            const [vibration, setVibration] = useState(editingAlarm?.vibration || 'medium');
+            const [mathChallenge, setMathChallenge] = useState(editingAlarm?.mathChallenge || false);
+            const fileInputRef = useRef(null);
 
             const toggleWeekday = (day) => {
                 setRepeat(prev => 
@@ -727,6 +1189,21 @@
                         ? prev.filter(d => d !== day)
                         : [...prev, day].sort()
                 );
+            };
+
+            const handleSoundUpload = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('audio/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        setCustomSound({
+                            name: file.name,
+                            data: event.target.result
+                        });
+                        setSound('custom');
+                    };
+                    reader.readAsDataURL(file);
+                }
             };
 
             const handleSubmit = (e) => {
@@ -737,7 +1214,11 @@
                     repeat,
                     sound,
                     volume,
-                    note
+                    note,
+                    customSound,
+                    fadeDuration,
+                    vibration,
+                    mathChallenge
                 });
             };
 
@@ -789,12 +1270,32 @@
                                 <div
                                     key={s.id}
                                     className={`sound-option ${sound === s.id ? 'active' : ''}`}
-                                    onClick={() => setSound(s.id)}
+                                    onClick={() => {
+                                        setSound(s.id);
+                                        setCustomSound(null);
+                                    }}
                                 >
                                     <div className="sound-name">{s.name}</div>
                                     <div className="sound-desc">{s.description}</div>
                                 </div>
                             ))}
+                        </div>
+                        <div className="file-upload">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="audio/*"
+                                onChange={handleSoundUpload}
+                                style={{ display: 'none' }}
+                            />
+                            <button
+                                type="button"
+                                className={`upload-btn ${customSound ? 'has-file' : ''}`}
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <Icon name="upload" size={20} />
+                                {customSound ? `✓ ${customSound.name}` : 'Enviar Música Personalizada'}
+                            </button>
                         </div>
                     </div>
 
@@ -809,6 +1310,52 @@
                             value={volume}
                             onChange={(e) => setVolume(parseFloat(e.target.value))}
                         />
+                    </div>
+
+                    <div className="form-group fade-duration">
+                        <label className="form-label">Fade In: {fadeDuration}s</label>
+                        <input
+                            type="range"
+                            className="volume-slider"
+                            min="0"
+                            max="30"
+                            step="5"
+                            value={fadeDuration}
+                            onChange={(e) => setFadeDuration(parseInt(e.target.value))}
+                        />
+                        <small style={{ color: '#718096', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                            Aumenta o volume gradualmente (0 = desativado)
+                        </small>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Padrão de Vibração</label>
+                        <div className="vibration-pattern">
+                            {VIBRATION_PATTERNS.map(v => (
+                                <div
+                                    key={v.id}
+                                    className={`vibration-option ${vibration === v.id ? 'active' : ''}`}
+                                    onClick={() => setVibration(v.id)}
+                                >
+                                    {v.name}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <div className="checkbox-group">
+                            <input
+                                type="checkbox"
+                                id="mathChallenge"
+                                checked={mathChallenge}
+                                onChange={(e) => setMathChallenge(e.target.checked)}
+                            />
+                            <label htmlFor="mathChallenge">
+                                <Icon name="brain" size={16} style={{ display: 'inline', marginRight: '5px' }} />
+                                Desafio matemático para desligar
+                            </label>
+                        </div>
                     </div>
 
                     <div className="form-group">
@@ -837,28 +1384,69 @@
         function AlarmApp() {
             const [alarms, setAlarms] = useState([]);
             const [showModal, setShowModal] = useState(false);
+            const [showSettings, setShowSettings] = useState(false);
             const [editingAlarm, setEditingAlarm] = useState(null);
             const [currentTime, setCurrentTime] = useState(new Date());
             const [activeAlarm, setActiveAlarm] = useState(null);
+            const [settings, setSettings] = useState({});
+            const [dailyQuote, setDailyQuote] = useState(null);
+            const [mathProblem, setMathProblem] = useState(null);
+            const [mathAnswer, setMathAnswer] = useState('');
+            const [mathFeedback, setMathFeedback] = useState('');
             const audioRef = useRef(null);
             const lastAlarmCheck = useRef('');
+            const fadeIntervalRef = useRef(null);
 
-            // Carregar alarmes
+            // Carregar dados
             useEffect(() => {
-                const saved = localStorage.getItem('alarmsPro');
-                if (saved) {
+                const savedAlarms = localStorage.getItem('alarmsPro');
+                const savedSettings = localStorage.getItem('alarmSettings');
+                
+                if (savedAlarms) {
                     try {
-                        setAlarms(JSON.parse(saved));
+                        setAlarms(JSON.parse(savedAlarms));
                     } catch (e) {
                         console.error('Erro ao carregar alarmes:', e);
                     }
                 }
+                
+                if (savedSettings) {
+                    try {
+                        const parsedSettings = JSON.parse(savedSettings);
+                        setSettings(parsedSettings);
+                        applyTheme(parsedSettings);
+                    } catch (e) {
+                        console.error('Erro ao carregar configurações:', e);
+                    }
+                }
+
+                // Frase diária
+                const quoteIndex = new Date().getDate() % MOTIVATIONAL_QUOTES.length;
+                setDailyQuote(MOTIVATIONAL_QUOTES[quoteIndex]);
             }, []);
 
-            // Salvar alarmes
+            // Salvar dados
             useEffect(() => {
                 localStorage.setItem('alarmsPro', JSON.stringify(alarms));
             }, [alarms]);
+
+            useEffect(() => {
+                localStorage.setItem('alarmSettings', JSON.stringify(settings));
+                applyTheme(settings);
+            }, [settings]);
+
+            const applyTheme = (settings) => {
+                const body = document.body;
+                
+                if (settings.customBg) {
+                    body.style.background = `url(${settings.customBg})`;
+                    body.classList.add('custom-bg');
+                } else {
+                    const theme = THEMES.find(t => t.id === settings.theme) || THEMES[0];
+                    body.style.background = theme.gradient;
+                    body.classList.remove('custom-bg');
+                }
+            };
 
             // Atualizar relógio
             useEffect(() => {
@@ -872,7 +1460,6 @@
                 const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
                 const currentDay = now.getDay();
 
-                // Evita disparar múltiplas vezes no mesmo minuto
                 if (timeStr === lastAlarmCheck.current) return;
                 lastAlarmCheck.current = timeStr;
 
@@ -895,26 +1482,86 @@
                 }
             }, []);
 
+            const generateMathProblem = () => {
+                const num1 = Math.floor(Math.random() * 20) + 1;
+                const num2 = Math.floor(Math.random() * 20) + 1;
+                const operations = ['+', '-', '×'];
+                const operation = operations[Math.floor(Math.random() * operations.length)];
+                
+                let answer;
+                switch(operation) {
+                    case '+': answer = num1 + num2; break;
+                    case '-': answer = num1 - num2; break;
+                    case '×': answer = num1 * num2; break;
+                }
+                
+                return {
+                    question: `${num1} ${operation} ${num2}`,
+                    answer: answer
+                };
+            };
+
             const triggerAlarm = (alarm) => {
                 setActiveAlarm(alarm);
+                
+                if (alarm.mathChallenge) {
+                    const problem = generateMathProblem();
+                    setMathProblem(problem);
+                    setMathAnswer('');
+                    setMathFeedback('');
+                }
+                
                 playAlarmSound(alarm);
 
                 if ('Notification' in window && Notification.permission === 'granted') {
                     new Notification('⏰ Alarme Tocando!', {
                         body: alarm.label || `Alarme: ${alarm.time}`,
                         icon: '/icon-192.png',
-                        vibrate: [300, 100, 300],
+                        vibrate: VIBRATION_PATTERNS.find(v => v.id === alarm.vibration)?.pattern || [400, 200, 400],
                         tag: 'alarm',
                         requireInteraction: true
                     });
                 }
 
                 if ('vibrate' in navigator) {
-                    navigator.vibrate([400, 200, 400, 200, 400]);
+                    const pattern = VIBRATION_PATTERNS.find(v => v.id === alarm.vibration)?.pattern || [400, 200, 400];
+                    navigator.vibrate(pattern);
                 }
             };
 
             const playAlarmSound = (alarm) => {
+                if (alarm.customSound) {
+                    const audio = new Audio(alarm.customSound.data);
+                    audio.loop = true;
+                    
+                    if (alarm.fadeDuration > 0) {
+                        audio.volume = 0;
+                        let currentVolume = 0;
+                        const targetVolume = alarm.volume || 0.7;
+                        const steps = alarm.fadeDuration * 10;
+                        const increment = targetVolume / steps;
+                        
+                        fadeIntervalRef.current = setInterval(() => {
+                            currentVolume += increment;
+                            if (currentVolume >= targetVolume) {
+                                audio.volume = targetVolume;
+                                clearInterval(fadeIntervalRef.current);
+                            } else {
+                                audio.volume = currentVolume;
+                            }
+                        }, 100);
+                    } else {
+                        audio.volume = alarm.volume || 0.7;
+                    }
+                    
+                    audio.play();
+                    audioRef.current = audio;
+                } else {
+                    playDefaultSound(alarm);
+                }
+            };
+
+            const playDefaultSound = (alarm) => {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -923,16 +1570,25 @@
                 gainNode.connect(audioContext.destination);
 
                 const soundConfigs = {
-                    1: { freq: 800, type: 'square' },    // Clássico
-                    2: { freq: 440, type: 'sine' },      // Suave
-                    3: { freq: 1200, type: 'sawtooth' }, // Energético
-                    4: { freq: 523, type: 'sine' }       // Natureza
+                    1: { freq: 800, type: 'square' },
+                    2: { freq: 440, type: 'sine' },
+                    3: { freq: 1200, type: 'sawtooth' },
+                    4: { freq: 523, type: 'sine' }
                 };
 
                 const config = soundConfigs[alarm.sound] || soundConfigs[1];
                 oscillator.frequency.value = config.freq;
                 oscillator.type = config.type;
-                gainNode.gain.value = alarm.volume || 0.7;
+                
+                if (alarm.fadeDuration > 0) {
+                    gainNode.gain.value = 0;
+                    gainNode.gain.linearRampToValueAtTime(
+                        alarm.volume || 0.7,
+                        audioContext.currentTime + alarm.fadeDuration
+                    );
+                } else {
+                    gainNode.gain.value = alarm.volume || 0.7;
+                }
 
                 oscillator.start();
 
@@ -954,18 +1610,43 @@
                 audioRef.current = { oscillator, interval: beepInterval, context: audioContext };
             };
 
+            const checkMathAnswer = () => {
+                const userAnswer = parseInt(mathAnswer);
+                if (userAnswer === mathProblem.answer) {
+                    setMathFeedback('correct');
+                    setTimeout(() => {
+                        stopAlarm();
+                    }, 1000);
+                } else {
+                    setMathFeedback('incorrect');
+                    setMathAnswer('');
+                    setTimeout(() => setMathFeedback(''), 2000);
+                }
+            };
+
             const stopAlarm = () => {
+                if (fadeIntervalRef.current) {
+                    clearInterval(fadeIntervalRef.current);
+                }
+                
                 if (audioRef.current) {
                     try {
-                        audioRef.current.oscillator.stop();
-                        clearInterval(audioRef.current.interval);
-                        audioRef.current.context.close();
+                        if (audioRef.current.pause) {
+                            audioRef.current.pause();
+                        } else {
+                            audioRef.current.oscillator.stop();
+                            clearInterval(audioRef.current.interval);
+                            audioRef.current.context.close();
+                        }
                     } catch (e) {
                         console.error('Erro ao parar alarme:', e);
                     }
                     audioRef.current = null;
                 }
                 setActiveAlarm(null);
+                setMathProblem(null);
+                setMathAnswer('');
+                setMathFeedback('');
             };
 
             const snoozeAlarm = () => {
@@ -983,7 +1664,11 @@
                     repeat: [],
                     sound: activeAlarm.sound,
                     volume: activeAlarm.volume,
-                    note: activeAlarm.note
+                    note: activeAlarm.note,
+                    customSound: activeAlarm.customSound,
+                    fadeDuration: activeAlarm.fadeDuration,
+                    vibration: activeAlarm.vibration,
+                    mathChallenge: false
                 };
 
                 setAlarms([...alarms, snoozedAlarm]);
@@ -1030,6 +1715,10 @@
 
             return (
                 <div className="app">
+                    <button className="settings-btn" onClick={() => setShowSettings(true)}>
+                        <Icon name="settings" size={24} color="white" />
+                    </button>
+
                     <div className="header">
                         <div className="clock">
                             {currentTime.toLocaleTimeString('pt-BR', { 
@@ -1041,6 +1730,13 @@
                     </div>
 
                     <div className="container">
+                        {settings.showQuotes !== false && dailyQuote && (
+                            <div className="motivational-quotes">
+                                <div className="quote-text">"{dailyQuote.text}"</div>
+                                <div className="quote-author">— {dailyQuote.author}</div>
+                            </div>
+                        )}
+
                         <button 
                             className="add-button"
                             onClick={() => {
@@ -1065,7 +1761,7 @@
                                 alarms.map(alarm => (
                                     <div 
                                         key={alarm.id} 
-                                        className={`alarm-card ${!alarm.enabled ? 'disabled' : ''}`}
+                                        className={`alarm-card ${!alarm.enabled ? 'disabled' : ''} ${alarm.customSound ? 'custom-sound' : ''}`}
                                     >
                                         <div className="alarm-header">
                                             <div className="alarm-time">{alarm.time}</div>
@@ -1086,14 +1782,32 @@
                                                 <Icon name="repeat" size={14} />
                                                 {getRepeatText(alarm.repeat)}
                                             </div>
-                                            <div className="detail-badge">
-                                                <Icon name="music" size={14} />
-                                                {DEFAULT_SOUNDS.find(s => s.id === alarm.sound)?.name}
-                                            </div>
+                                            {alarm.customSound ? (
+                                                <div className="detail-badge custom">
+                                                    <Icon name="music" size={14} />
+                                                    Personalizado
+                                                </div>
+                                            ) : (
+                                                <div className="detail-badge">
+                                                    <Icon name="music" size={14} />
+                                                    {DEFAULT_SOUNDS.find(s => s.id === alarm.sound)?.name}
+                                                </div>
+                                            )}
                                             <div className="detail-badge">
                                                 <Icon name="volume" size={14} />
                                                 {Math.round(alarm.volume * 100)}%
                                             </div>
+                                            {alarm.fadeDuration > 0 && (
+                                                <div className="detail-badge">
+                                                    🌅 Fade {alarm.fadeDuration}s
+                                                </div>
+                                            )}
+                                            {alarm.mathChallenge && (
+                                                <div className="detail-badge">
+                                                    <Icon name="brain" size={14} />
+                                                    Desafio
+                                                </div>
+                                            )}
                                         </div>
 
                                         {alarm.note && (
@@ -1151,20 +1865,68 @@
                         </div>
                     )}
 
+                    {showSettings && (
+                        <div className="modal-overlay" onClick={() => setShowSettings(false)}>
+                            <div onClick={e => e.stopPropagation()}>
+                                <SettingsPanel
+                                    settings={settings}
+                                    onSave={setSettings}
+                                    onClose={() => setShowSettings(false)}
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     {activeAlarm && (
                         <div className="alarm-ringing">
                             <div className="alarm-ringing-content">
                                 <div className="alarm-icon">⏰</div>
                                 <div className="alarm-ringing-time">{activeAlarm.time}</div>
                                 <div className="alarm-ringing-label">{activeAlarm.label}</div>
-                                <div className="alarm-ringing-actions">
-                                    <button className="btn-stop" onClick={stopAlarm}>
-                                        Desligar
-                                    </button>
-                                    <button className="btn-snooze" onClick={snoozeAlarm}>
-                                        Soneca (5 min)
-                                    </button>
-                                </div>
+                                
+                                {activeAlarm.mathChallenge && mathProblem ? (
+                                    <div className="math-challenge">
+                                        <div className="challenge-title">
+                                            <Icon name="brain" size={20} />
+                                            Resolva para desligar o alarme
+                                        </div>
+                                        <div className="math-problem">
+                                            {mathProblem.question} = ?
+                                        </div>
+                                        <input
+                                            type="number"
+                                            className="challenge-input"
+                                            value={mathAnswer}
+                                            onChange={(e) => setMathAnswer(e.target.value)}
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') checkMathAnswer();
+                                            }}
+                                            placeholder="?"
+                                            autoFocus
+                                        />
+                                        {mathFeedback && (
+                                            <div className={`challenge-feedback ${mathFeedback}`}>
+                                                {mathFeedback === 'correct' ? '✓ Correto!' : '✗ Tente novamente'}
+                                            </div>
+                                        )}
+                                        <button 
+                                            className="btn-save"
+                                            onClick={checkMathAnswer}
+                                            style={{ marginTop: '15px' }}
+                                        >
+                                            Verificar Resposta
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="alarm-ringing-actions">
+                                        <button className="btn-stop" onClick={stopAlarm}>
+                                            Desligar
+                                        </button>
+                                        <button className="btn-snooze" onClick={snoozeAlarm}>
+                                            Soneca (5 min)
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -1172,15 +1934,17 @@
             );
         }
 
-        // Renderizar app
+        // Renderizar
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<AlarmApp />);
 
-        // Remover loading
         setTimeout(() => {
             const loading = document.getElementById('loading');
             if (loading) loading.remove();
         }, 500);
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
