@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="Alarme Avançado - Desperte com estilo">
-    <title>Alarme Pro - Seu Despertador Inteligente</title>
-    
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/Alarme-Pro/manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Alarme Pro - Despertador Inteligente</title>
     
     <style>
         * {
@@ -27,11 +21,612 @@
             overflow-x: hidden;
         }
 
-        #root {
+        .app {
             min-height: 100vh;
+            padding: 20px;
         }
 
-        /* Loading inicial */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .clock {
+            font-size: clamp(48px, 12vw, 72px);
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .date {
+            font-size: clamp(14px, 4vw, 18px);
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .add-button {
+            width: 100%;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .add-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .alarms-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .alarm-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alarm-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .alarm-card:hover::before {
+            opacity: 1;
+        }
+
+        .alarm-card.disabled {
+            opacity: 0.5;
+        }
+
+        .alarm-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .alarm-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .alarm-time {
+            font-size: clamp(40px, 10vw, 52px);
+            font-weight: 300;
+            color: #667eea;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(28px);
+        }
+
+        .alarm-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .alarm-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .detail-badge {
+            background: #edf2f7;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .detail-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .alarm-note {
+            background: #fef5e7;
+            border-left: 3px solid #f39c12;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #7d6608;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .alarm-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-edit {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .btn-edit:hover {
+            background: #bbdefb;
+        }
+
+        .btn-delete {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .btn-delete:hover {
+            background: #ffcdd2;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(50px) scale(0.95); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .close-btn {
+            background: #f7fafc;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #edf2f7;
+            transform: rotate(90deg);
+        }
+
+        .close-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .time-input {
+            font-size: 42px;
+            text-align: center;
+            font-weight: 300;
+            color: #667eea;
+            padding: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .weekday-btn {
+            padding: 12px 4px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #718096;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .weekday-btn:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        .weekday-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .sound-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .sound-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .sound-option:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        .sound-option.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .sound-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .sound-desc {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .volume-control {
+            margin-top: 15px;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-save:active {
+            transform: translateY(0);
+        }
+
+        .alarm-ringing {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alarm-ringing-content {
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+
+        .alarm-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: ring 0.5s ease-in-out infinite;
+        }
+
+        @keyframes ring {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(15deg); }
+        }
+
+        .alarm-ringing-time {
+            font-size: 64px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .alarm-ringing-label {
+            font-size: 24px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .alarm-ringing-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-stop, .btn-snooze {
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-stop {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .btn-snooze {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-snooze:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 480px) {
+            .app {
+                padding: 15px;
+            }
+            
+            .modal {
+                padding: 20px;
+            }
+            
+            .alarm-ringing-time {
+                font-size: 48px;
+            }
+            
+            .btn-stop, .btn-snooze {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
+        }
+
         .loading-screen {
             position: fixed;
             top: 0;
@@ -69,558 +664,523 @@
 </head>
 <body>
     <div class="loading-screen" id="loading">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Carregando Alarme Pro...</div>
-</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Carregando Alarme Pro...</div>
+    </div>
 
-<div id="root"></div>
+    <div id="root"></div>
 
-    <!-- React e Babel -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- App Script -->
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-// ====================================
-// COMPONENTES DE ÍCONES
-// ====================================
-const Icon = ({ name, size = 24, className = "" }) => {
-    const icons = {
-        plus: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-        trash: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
-        edit: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
-        bell: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
-        music: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
-        stickyNote: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg>,
-        clock: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-        volume: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
-        repeat: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>,
-        save: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
-        x: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-        check: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>,
-        upload: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
-        sun: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
-        moon: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>,
-    };
-    return icons[name] || null;
-};
+        // ====================================
+        // COMPONENTES DE ÍCONES
+        // ====================================
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const icons = {
+                plus: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+                trash: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+                edit: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+                bell: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+                music: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
+                clock: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+                volume: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
+                repeat: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>,
+                save: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
+                x: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+                stickyNote: <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg>,
+            };
+            return icons[name] || null;
+        };
 
-// ====================================
-// SONS PADRÃO DE ALARME
-// ====================================
-const DEFAULT_SOUNDS = [
-    { id: 1, name: "Clássico", description: "Bip-Bip tradicional", type: "beep" },
-    { id: 2, name: "Suave", description: "Despertar tranquilo", type: "gentle" },
-    { id: 3, name: "Energético", description: "Comece com energia", type: "energetic" },
-    { id: 4, name: "Natureza", description: "Sons da natureza", type: "nature" },
-];
+        // ====================================
+        // SONS PADRÃO
+        // ====================================
+        const DEFAULT_SOUNDS = [
+            { id: 1, name: "Clássico", description: "Bip-Bip tradicional", type: "beep" },
+            { id: 2, name: "Suave", description: "Despertar tranquilo", type: "gentle" },
+            { id: 3, name: "Energético", description: "Energia total", type: "energetic" },
+            { id: 4, name: "Natureza", description: "Sons relaxantes", type: "nature" },
+        ];
 
-// ====================================
-// COMPONENTE PRINCIPAL
-// ====================================
-function AlarmApp() {
-    const [alarms, setAlarms] = useState([]);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [editingAlarm, setEditingAlarm] = useState(null);
-    const [currentTime, setCurrentTime] = useState(new Date());
-    const [activeAlarm, setActiveAlarm] = useState(null);
-    const [customSounds, setCustomSounds] = useState([]);
-    const audioRef = useRef(null);
+        const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+        const WEEKDAYS_FULL = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
-    // Carregar alarmes do localStorage
-    useEffect(() => {
-        const savedAlarms = localStorage.getItem('alarms');
-        const savedSounds = localStorage.getItem('customSounds');
-        if (savedAlarms) setAlarms(JSON.parse(savedAlarms));
-        if (savedSounds) setCustomSounds(JSON.parse(savedSounds));
-    }, []);
+        // ====================================
+        // COMPONENTE DE FORMULÁRIO
+        // ====================================
+        function AlarmForm({ onSave, onCancel, editingAlarm }) {
+            const [time, setTime] = useState(editingAlarm?.time || '07:00');
+            const [label, setLabel] = useState(editingAlarm?.label || '');
+            const [repeat, setRepeat] = useState(editingAlarm?.repeat || []);
+            const [sound, setSound] = useState(editingAlarm?.sound || 1);
+            const [volume, setVolume] = useState(editingAlarm?.volume || 0.7);
+            const [note, setNote] = useState(editingAlarm?.note || '');
 
-    // Atualizar relógio
-    useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
-
-    // Verificar alarmes
-    useEffect(() => {
-        const checkAlarms = setInterval(() => {
-            const now = new Date();
-            const currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            const currentDay = now.getDay();
-
-            alarms.forEach(alarm => {
-                if (alarm.enabled && alarm.time === currentTimeStr) {
-                    // Verifica se é um alarme recorrente ou se é para hoje
-                    const shouldRing = alarm.repeat.length === 0 || alarm.repeat.includes(currentDay);
-                    
-                    if (shouldRing && !activeAlarm) {
-                        triggerAlarm(alarm);
-                    }
-                }
-            });
-        }, 5000); // Verifica a cada 5 segundos
-
-        return () => clearInterval(checkAlarms);
-    }, [alarms, activeAlarm]);
-
-    // Salvar alarmes
-    useEffect(() => {
-        localStorage.setItem('alarms', JSON.stringify(alarms));
-    }, [alarms]);
-
-    // Salvar sons customizados
-    useEffect(() => {
-        localStorage.setItem('customSounds', JSON.stringify(customSounds));
-    }, [customSounds]);
-
-    const triggerAlarm = (alarm) => {
-        setActiveAlarm(alarm);
-        playAlarmSound(alarm);
-        
-        // Notificação do navegador
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('⏰ Alarme!', {
-                body: alarm.label || `Hora de acordar! ${alarm.time}`,
-                icon: '/icon-192.png',
-                vibrate: [200, 100, 200],
-                tag: 'alarm'
-            });
-        }
-
-        // Vibração (mobile)
-        if ('vibrate' in navigator) {
-            navigator.vibrate([500, 200, 500, 200, 500]);
-        }
-    };
-
-    const playAlarmSound = (alarm) => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-        }
-
-        if (alarm.soundUrl) {
-            const audio = new Audio(alarm.soundUrl);
-            audio.loop = true;
-            audio.volume = alarm.volume || 0.7;
-            audio.play();
-            audioRef.current = audio;
-        } else {
-            // Som padrão do sistema
-            playDefaultSound();
-        }
-    };
-
-    const playDefaultSound = () => {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        gainNode.gain.value = 0.3;
-
-        oscillator.start();
-        
-        let beepCount = 0;
-        const beepInterval = setInterval(() => {
-            oscillator.frequency.value = beepCount % 2 === 0 ? 800 : 600;
-            beepCount++;
-            if (beepCount > 20) {
-                clearInterval(beepInterval);
-            }
-        }, 300);
-
-        setTimeout(() => {
-            oscillator.stop();
-            audioContext.close();
-        }, 10000);
-    };
-
-    const stopAlarm = () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current = null;
-        }
-        setActiveAlarm(null);
-    };
-
-    const snoozeAlarm = () => {
-        if (activeAlarm) {
-            const snoozeTime = 5; // minutos
-            const newTime = new Date();
-            newTime.setMinutes(newTime.getMinutes() + snoozeTime);
-            
-            const snoozedAlarm = {
-                ...activeAlarm,
-                time: `${String(newTime.getHours()).padStart(2, '0')}:${String(newTime.getMinutes()).padStart(2, '0')}`,
-                label: `${activeAlarm.label} (Soneca)`,
-                repeat: []
+            const toggleWeekday = (day) => {
+                setRepeat(prev => 
+                    prev.includes(day) 
+                        ? prev.filter(d => d !== day)
+                        : [...prev, day].sort()
+                );
             };
 
-            setAlarms([...alarms, snoozedAlarm]);
-            stopAlarm();
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSave({
+                    time,
+                    label: label || 'Alarme',
+                    repeat,
+                    sound,
+                    volume,
+                    note
+                });
+            };
+
+            return (
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label className="form-label">Horário</label>
+                        <input
+                            type="time"
+                            className="form-input time-input"
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Nome do Alarme</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={label}
+                            onChange={(e) => setLabel(e.target.value)}
+                            placeholder="Ex: Acordar para trabalho"
+                            maxLength={50}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Repetir</label>
+                        <div className="weekdays">
+                            {WEEKDAYS.map((day, index) => (
+                                <button
+                                    key={index}
+                                    type="button"
+                                    className={`weekday-btn ${repeat.includes(index) ? 'active' : ''}`}
+                                    onClick={() => toggleWeekday(index)}
+                                >
+                                    {day}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Som do Alarme</label>
+                        <div className="sound-grid">
+                            {DEFAULT_SOUNDS.map(s => (
+                                <div
+                                    key={s.id}
+                                    className={`sound-option ${sound === s.id ? 'active' : ''}`}
+                                    onClick={() => setSound(s.id)}
+                                >
+                                    <div className="sound-name">{s.name}</div>
+                                    <div className="sound-desc">{s.description}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Volume: {Math.round(volume * 100)}%</label>
+                        <input
+                            type="range"
+                            className="volume-slider"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={volume}
+                            onChange={(e) => setVolume(parseFloat(e.target.value))}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Nota (opcional)</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            placeholder="Ex: Tomar remédio"
+                            maxLength={100}
+                        />
+                    </div>
+
+                    <button type="submit" className="btn-save">
+                        <Icon name="save" size={20} />
+                        {editingAlarm ? 'Atualizar Alarme' : 'Criar Alarme'}
+                    </button>
+                </form>
+            );
         }
-    };
 
-    const addAlarm = (newAlarm) => {
-        const alarm = {
-            id: Date.now(),
-            enabled: true,
-            ...newAlarm
-        };
-        setAlarms([...alarms, alarm]);
-        setShowAddModal(false);
-    };
+        // ====================================
+        // COMPONENTE PRINCIPAL
+        // ====================================
+        function AlarmApp() {
+            const [alarms, setAlarms] = useState([]);
+            const [showModal, setShowModal] = useState(false);
+            const [editingAlarm, setEditingAlarm] = useState(null);
+            const [currentTime, setCurrentTime] = useState(new Date());
+            const [activeAlarm, setActiveAlarm] = useState(null);
+            const audioRef = useRef(null);
+            const lastAlarmCheck = useRef('');
 
-    const updateAlarm = (id, updates) => {
-        setAlarms(alarms.map(alarm => 
-            alarm.id === id ? { ...alarm, ...updates } : alarm
-        ));
-    };
+            // Carregar alarmes
+            useEffect(() => {
+                const saved = localStorage.getItem('alarmsPro');
+                if (saved) {
+                    try {
+                        setAlarms(JSON.parse(saved));
+                    } catch (e) {
+                        console.error('Erro ao carregar alarmes:', e);
+                    }
+                }
+            }, []);
 
-    const deleteAlarm = (id) => {
-        setAlarms(alarms.filter(alarm => alarm.id !== id));
-    };
+            // Salvar alarmes
+            useEffect(() => {
+                localStorage.setItem('alarmsPro', JSON.stringify(alarms));
+            }, [alarms]);
 
-    const toggleAlarm = (id) => {
-        updateAlarm(id, { enabled: !alarms.find(a => a.id === id).enabled });
-    };
+            // Atualizar relógio
+            useEffect(() => {
+                const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
 
-    const requestNotificationPermission = () => {
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
+            // Verificar alarmes
+            useEffect(() => {
+                const now = new Date();
+                const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const currentDay = now.getDay();
+
+                // Evita disparar múltiplas vezes no mesmo minuto
+                if (timeStr === lastAlarmCheck.current) return;
+                lastAlarmCheck.current = timeStr;
+
+                alarms.forEach(alarm => {
+                    if (!alarm.enabled || activeAlarm) return;
+
+                    if (alarm.time === timeStr) {
+                        const shouldRing = alarm.repeat.length === 0 || alarm.repeat.includes(currentDay);
+                        if (shouldRing) {
+                            triggerAlarm(alarm);
+                        }
+                    }
+                });
+            }, [currentTime, alarms, activeAlarm]);
+
+            // Permissão de notificação
+            useEffect(() => {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+            }, []);
+
+            const triggerAlarm = (alarm) => {
+                setActiveAlarm(alarm);
+                playAlarmSound(alarm);
+
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('⏰ Alarme Tocando!', {
+                        body: alarm.label || `Alarme: ${alarm.time}`,
+                        icon: '/icon-192.png',
+                        vibrate: [300, 100, 300],
+                        tag: 'alarm',
+                        requireInteraction: true
+                    });
+                }
+
+                if ('vibrate' in navigator) {
+                    navigator.vibrate([400, 200, 400, 200, 400]);
+                }
+            };
+
+            const playAlarmSound = (alarm) => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                const soundConfigs = {
+                    1: { freq: 800, type: 'square' },    // Clássico
+                    2: { freq: 440, type: 'sine' },      // Suave
+                    3: { freq: 1200, type: 'sawtooth' }, // Energético
+                    4: { freq: 523, type: 'sine' }       // Natureza
+                };
+
+                const config = soundConfigs[alarm.sound] || soundConfigs[1];
+                oscillator.frequency.value = config.freq;
+                oscillator.type = config.type;
+                gainNode.gain.value = alarm.volume || 0.7;
+
+                oscillator.start();
+
+                let beepCount = 0;
+                const beepInterval = setInterval(() => {
+                    if (beepCount % 2 === 0) {
+                        oscillator.frequency.value = config.freq;
+                    } else {
+                        oscillator.frequency.value = config.freq * 0.8;
+                    }
+                    beepCount++;
+                    if (beepCount > 60 || !activeAlarm) {
+                        clearInterval(beepInterval);
+                        oscillator.stop();
+                        audioContext.close();
+                    }
+                }, 500);
+
+                audioRef.current = { oscillator, interval: beepInterval, context: audioContext };
+            };
+
+            const stopAlarm = () => {
+                if (audioRef.current) {
+                    try {
+                        audioRef.current.oscillator.stop();
+                        clearInterval(audioRef.current.interval);
+                        audioRef.current.context.close();
+                    } catch (e) {
+                        console.error('Erro ao parar alarme:', e);
+                    }
+                    audioRef.current = null;
+                }
+                setActiveAlarm(null);
+            };
+
+            const snoozeAlarm = () => {
+                if (!activeAlarm) return;
+
+                const snoozeMinutes = 5;
+                const newTime = new Date();
+                newTime.setMinutes(newTime.getMinutes() + snoozeMinutes);
+
+                const snoozedAlarm = {
+                    id: Date.now(),
+                    time: `${String(newTime.getHours()).padStart(2, '0')}:${String(newTime.getMinutes()).padStart(2, '0')}`,
+                    label: `${activeAlarm.label} (Soneca)`,
+                    enabled: true,
+                    repeat: [],
+                    sound: activeAlarm.sound,
+                    volume: activeAlarm.volume,
+                    note: activeAlarm.note
+                };
+
+                setAlarms([...alarms, snoozedAlarm]);
+                stopAlarm();
+            };
+
+            const addAlarm = (data) => {
+                if (editingAlarm) {
+                    setAlarms(alarms.map(a => 
+                        a.id === editingAlarm.id ? { ...a, ...data } : a
+                    ));
+                } else {
+                    setAlarms([...alarms, { id: Date.now(), enabled: true, ...data }]);
+                }
+                setShowModal(false);
+                setEditingAlarm(null);
+            };
+
+            const deleteAlarm = (id) => {
+                if (confirm('Deseja realmente excluir este alarme?')) {
+                    setAlarms(alarms.filter(a => a.id !== id));
+                }
+            };
+
+            const toggleAlarm = (id) => {
+                setAlarms(alarms.map(a => 
+                    a.id === id ? { ...a, enabled: !a.enabled } : a
+                ));
+            };
+
+            const formatDate = (date) => {
+                const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+                return `${days[date.getDay()]}, ${date.getDate()} de ${months[date.getMonth()]}`;
+            };
+
+            const getRepeatText = (repeat) => {
+                if (repeat.length === 0) return 'Uma vez';
+                if (repeat.length === 7) return 'Todos os dias';
+                if (repeat.length === 5 && !repeat.includes(0) && !repeat.includes(6)) return 'Dias úteis';
+                if (repeat.length === 2 && repeat.includes(0) && repeat.includes(6)) return 'Finais de semana';
+                return repeat.map(d => WEEKDAYS[d]).join(', ');
+            };
+
+            return (
+                <div className="app">
+                    <div className="header">
+                        <div className="clock">
+                            {currentTime.toLocaleTimeString('pt-BR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit'
+                            })}
+                        </div>
+                        <div className="date">{formatDate(currentTime)}</div>
+                    </div>
+
+                    <div className="container">
+                        <button 
+                            className="add-button"
+                            onClick={() => {
+                                setEditingAlarm(null);
+                                setShowModal(true);
+                            }}
+                        >
+                            <Icon name="plus" size={20} />
+                            Novo Alarme
+                        </button>
+
+                        <div className="alarms-list">
+                            {alarms.length === 0 ? (
+                                <div className="empty-state">
+                                    <Icon name="bell" size={80} />
+                                    <div className="empty-state-text">
+                                        Nenhum alarme configurado.<br />
+                                        Adicione seu primeiro alarme!
+                                    </div>
+                                </div>
+                            ) : (
+                                alarms.map(alarm => (
+                                    <div 
+                                        key={alarm.id} 
+                                        className={`alarm-card ${!alarm.enabled ? 'disabled' : ''}`}
+                                    >
+                                        <div className="alarm-header">
+                                            <div className="alarm-time">{alarm.time}</div>
+                                            <label className="toggle-switch">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={alarm.enabled}
+                                                    onChange={() => toggleAlarm(alarm.id)}
+                                                />
+                                                <span className="slider"></span>
+                                            </label>
+                                        </div>
+
+                                        <div className="alarm-label">{alarm.label}</div>
+
+                                        <div className="alarm-details">
+                                            <div className="detail-badge">
+                                                <Icon name="repeat" size={14} />
+                                                {getRepeatText(alarm.repeat)}
+                                            </div>
+                                            <div className="detail-badge">
+                                                <Icon name="music" size={14} />
+                                                {DEFAULT_SOUNDS.find(s => s.id === alarm.sound)?.name}
+                                            </div>
+                                            <div className="detail-badge">
+                                                <Icon name="volume" size={14} />
+                                                {Math.round(alarm.volume * 100)}%
+                                            </div>
+                                        </div>
+
+                                        {alarm.note && (
+                                            <div className="alarm-note">
+                                                <Icon name="stickyNote" size={14} />
+                                                {' '}{alarm.note}
+                                            </div>
+                                        )}
+
+                                        <div className="alarm-actions">
+                                            <button 
+                                                className="btn btn-edit"
+                                                onClick={() => {
+                                                    setEditingAlarm(alarm);
+                                                    setShowModal(true);
+                                                }}
+                                            >
+                                                <Icon name="edit" size={16} />
+                                                Editar
+                                            </button>
+                                            <button 
+                                                className="btn btn-delete"
+                                                onClick={() => deleteAlarm(alarm.id)}
+                                            >
+                                                <Icon name="trash" size={16} />
+                                                Excluir
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {showModal && (
+                        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <div className="modal-header">
+                                    <h2 className="modal-title">
+                                        {editingAlarm ? 'Editar Alarme' : 'Novo Alarme'}
+                                    </h2>
+                                    <button 
+                                        className="close-btn"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        <Icon name="x" />
+                                    </button>
+                                </div>
+                                <AlarmForm
+                                    onSave={addAlarm}
+                                    onCancel={() => setShowModal(false)}
+                                    editingAlarm={editingAlarm}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {activeAlarm && (
+                        <div className="alarm-ringing">
+                            <div className="alarm-ringing-content">
+                                <div className="alarm-icon">⏰</div>
+                                <div className="alarm-ringing-time">{activeAlarm.time}</div>
+                                <div className="alarm-ringing-label">{activeAlarm.label}</div>
+                                <div className="alarm-ringing-actions">
+                                    <button className="btn-stop" onClick={stopAlarm}>
+                                        Desligar
+                                    </button>
+                                    <button className="btn-snooze" onClick={snoozeAlarm}>
+                                        Soneca (5 min)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
         }
-    };
 
-    useEffect(() => {
-        requestNotificationPermission();
-    }, []);
+        // Renderizar app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AlarmApp />);
 
-    return (
-        <div className="app">
-            <style>{
-                .app {
-                    min-height: 100vh;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    padding: 20px;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                }
-
-                .header {
-                    text-align: center;
-                    color: white;
-                    margin-bottom: 30px;
-                }
-
-                .clock {
-                    font-size: 64px;
-                    font-weight: 300;
-                    letter-spacing: 2px;
-                    text-shadow: 0 2px 20px rgba(0,0,0,0.2);
-                    margin: 20px 0;
-                }
-
-                .date {
-                    font-size: 18px;
-                    opacity: 0.9;
-                    margin-bottom: 10px;
-                }
-
-                .container {
-                    max-width: 600px;
-                    margin: 0 auto;
-                }
-
-                .add-button {
-                    width: 100%;
-                    padding: 18px;
-                    background: rgba(255, 255, 255, 0.2);
-                    border: 2px dashed rgba(255, 255, 255, 0.5);
-                    border-radius: 16px;
-                    color: white;
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    transition: all 0.3s;
-                    margin-bottom: 20px;
-                }
-
-                .add-button:hover {
-                    background: rgba(255, 255, 255, 0.3);
-                    transform: translateY(-2px);
-                }
-
-                .alarms-list {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                .alarm-card {
-                    background: white;
-                    border-radius: 20px;
-                    padding: 20px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-                    transition: all 0.3s;
-                }
-
-                .alarm-card.disabled {
-                    opacity: 0.6;
-                }
-
-                .alarm-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 15px;
-                }
-
-                .alarm-time {
-                    font-size: 48px;
-                    font-weight: 300;
-                    color: #667eea;
-                }
-
-                .toggle-switch {
-                    position: relative;
-                    width: 60px;
-                    height: 32px;
-                }
-
-                .toggle-switch input {
-                    opacity: 0;
-                    width: 0;
-                    height: 0;
-                }
-
-                .slider {
-                    position: absolute;
-                    cursor: pointer;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: #ccc;
-                    transition: 0.4s;
-                    border-radius: 34px;
-                }
-
-                .slider:before {
-                    position: absolute;
-                    content: "";
-                    height: 24px;
-                    width: 24px;
-                    left: 4px;
-                    bottom: 4px;
-                    background-color: white;
-                    transition: 0.4s;
-                    border-radius: 50%;
-                }
-
-                input:checked + .slider {
-                    background-color: #667eea;
-                }
-
-                input:checked + .slider:before {
-                    transform: translateX(28px);
-                }
-
-                .alarm-label {
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: #333;
-                    margin-bottom: 8px;
-                }
-
-                .alarm-details {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 10px;
-                    margin-bottom: 15px;
-                }
-
-                .detail-badge {
-                    background: #f0f0f0;
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-size: 13px;
-                    color: #666;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                }
-
-                .alarm-note {
-                    background: #fff3cd;
-                    border-left: 4px solid #ffc107;
-                    padding: 10px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    color: #856404;
-                    margin-bottom: 10px;
-                }
-
-                .alarm-actions {
-                    display: flex;
-                    gap: 10px;
-                }
-
-                .btn {
-                    flex: 1;
-                    padding: 10px;
-                    border: none;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 5px;
-                    transition: all 0.3s;
-                }
-
-                .btn-edit {
-                    background: #e3f2fd;
-                    color: #1976d2;
-                }
-
-                .btn-delete {
-                    background: #ffebee;
-                    color: #d32f2f;
-                }
-
-                .btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                }
-
-                .modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0, 0, 0, 0.7);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 20px;
-                    z-index: 1000;
-                    animation: fadeIn 0.3s;
-                }
-
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-
-                .modal {
-                    background: white;
-                    border-radius: 20px;
-                    padding: 30px;
-                    max-width: 500px;
-                    width: 100%;
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    animation: slideUp 0.3s;
-                }
-
-                @keyframes slideUp {
-                    from { transform: translateY(50px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-
-                .modal-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 25px;
-                }
-
-                .modal-title {
-                    font-size: 24px;
-                    font-weight: 700;
-                    color: #333;
-                }
-
-                .close-btn {
-                    background: #f0f0f0;
-                    border: none;
-                    border-radius: 50%;
-                    width: 36px;
-                    height: 36px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                }
-
-                .close-btn:hover {
-                    background: #e0e0e0;
-                    transform: rotate(90deg);
-                }
-
-                .form-group {
-                    margin-bottom: 20px;
-                }
-
-                .form-label {
-                    display: block;
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #333;
-                    margin-bottom: 8px;
-                }
-
-                .form-input {
-                    width: 100%;
-                    padding: 12px;
-                    border: 2px solid #e0e0e0;
-                    border-radius: 10px;
-                    font-size: 16px;
-                    transition: all 0.3s;
-                }
-
-                .form-input:focus {
-                    outline: none;
-                    border-color: #667eea;
-                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-                }
-
-                .time-input {
-                    font-size: 32px;
-                    text-align: center;
-                    font-weight: 300;
-                    color: #667eea;
-                }
-
-                .weekdays {
-                    display: grid;
-                    grid-template-columns: repeat(7, 1fr);
-                    gap: 8px;
-                }
-
-          const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<AlarmApp />);
-
-// remove o loading quando o app montar
-const loading = document.getElementById("loading");
-if (loading) loading.remove();
+        // Remover loading
+        setTimeout(() => {
+            const loading = document.getElementById('loading');
+            if (loading) loading.remove();
+        }, 500);
     </script>
 </body>
 </html>
