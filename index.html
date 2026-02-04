@@ -68,12 +68,12 @@
     </style>
 </head>
 <body>
-    <div id="root">
-        <div class="loading-screen">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Carregando Alarme Pro...</div>
-        </div>
-    </div>
+    <div class="loading-screen" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Carregando Alarme Pro...</div>
+</div>
+
+<div id="root"></div>
 
     <!-- React e Babel -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -307,7 +307,7 @@ function AlarmApp() {
 
     return (
         <div className="app">
-            <style>{`
+            <style>{
                 .app {
                     min-height: 100vh;
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -615,7 +615,12 @@ function AlarmApp() {
                     gap: 8px;
                 }
 
-          
+          const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<AlarmApp />);
+
+// remove o loading quando o app montar
+const loading = document.getElementById("loading");
+if (loading) loading.remove();
     </script>
 </body>
 </html>
