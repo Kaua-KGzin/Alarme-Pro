@@ -1061,6 +1061,8 @@
             { id: 'sos', name: 'SOS', pattern: [100, 100, 100, 100, 100, 200, 400, 200, 400, 200, 400, 200, 100, 100, 100] },
         ];
 
+        const MAX_CUSTOM_SOUND_SIZE = 1024 * 1024; // 1MB
+
         // ====================================
         // COMPONENTE DE CONFIGURAÇÕES
         // ====================================
@@ -1196,6 +1198,11 @@
             const handleSoundUpload = (e) => {
                 const file = e.target.files[0];
                 if (file && file.type.startsWith('audio/')) {
+                    if (file.size > MAX_CUSTOM_SOUND_SIZE) {
+                        alert('Arquivo muito grande. Use uma música de até 1MB para evitar falhas de salvamento.');
+                        return;
+                    }
+
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         setCustomSound({
@@ -1395,6 +1402,7 @@
             const [mathProblem, setMathProblem] = useState(null);
             const [mathAnswer, setMathAnswer] = useState('');
             const [mathFeedback, setMathFeedback] = useState('');
+            const [storageWarning, setStorageWarning] = useState('');
             const audioRef = useRef(null);
             const lastAlarmCheck = useRef('');
             const fadeIntervalRef = useRef(null);
@@ -1430,7 +1438,13 @@
 
             // Salvar dados
             useEffect(() => {
-                localStorage.setItem('alarmsPro', JSON.stringify(alarms));
+                try {
+                    localStorage.setItem('alarmsPro', JSON.stringify(alarms));
+                    setStorageWarning('');
+                } catch (e) {
+                    console.error('Erro ao salvar alarmes:', e);
+                    setStorageWarning('Não foi possível salvar todos os dados do alarme (limite de armazenamento). Tente usar uma música menor.');
+                }
             }, [alarms]);
 
             useEffect(() => {
@@ -1516,7 +1530,7 @@
             };
 
             const playAlarmSound = (alarm) => {
-                if (alarm.customSound) {
+                if (alarm.customSound?.data) {
                     const audio = new Audio(alarm.customSound.data);
                     audio.loop = true;
                     
@@ -1707,6 +1721,11 @@
                             })}
                         </div>
                         <div className="date">{formatDate(currentTime)}</div>
+                        {storageWarning && (
+                            <div style={{ marginTop: '12px', color: '#fff', fontSize: '13px', opacity: 0.95 }}>
+                                ⚠️ {storageWarning}
+                            </div>
+                        )}
                     </div>
 
                     <div className="container">
